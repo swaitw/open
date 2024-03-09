@@ -1,6 +1,5 @@
-const test = require('ava');
-const open = require('.');
-const {openApp} = open;
+import test from 'ava';
+import open, {openApp, apps} from './index.js';
 
 // Tests only checks that opening doesn't return an error
 // it has no way make sure that it actually opened anything.
@@ -24,13 +23,13 @@ test('open URL in default app', async t => {
 });
 
 test('open URL in specified app', async t => {
-	await t.notThrowsAsync(open('https://sindresorhus.com', {app: {name: open.apps.chrome}}));
+	await t.notThrowsAsync(open('https://sindresorhus.com', {app: {name: apps.chrome}}));
 });
 
 test('open URL in specified app with arguments', async t => {
 	await t.notThrowsAsync(async () => {
-		const proc = await open('https://sindresorhus.com', {app: {name: open.apps.chrome, arguments: ['--incognito']}});
-		t.deepEqual(proc.spawnargs, ['open', '-a', open.apps.chrome, 'https://sindresorhus.com', '--args', '--incognito']);
+		const process_ = await open('https://sindresorhus.com', {app: {name: apps.chrome, arguments: ['--incognito']}});
+		t.deepEqual(process_.spawnargs, ['open', '-a', apps.chrome, 'https://sindresorhus.com', '--args', '--incognito']);
 	});
 });
 
@@ -72,9 +71,25 @@ test('open URL with query strings and URL reserved characters with `url` option'
 });
 
 test('open Firefox without arguments', async t => {
-	await t.notThrowsAsync(openApp(open.apps.firefox));
+	await t.notThrowsAsync(openApp(apps.firefox));
 });
 
 test('open Chrome in incognito mode', async t => {
-	await t.notThrowsAsync(openApp(open.apps.chrome, {arguments: ['--incognito'], newInstance: true}));
+	await t.notThrowsAsync(openApp(apps.chrome, {arguments: ['--incognito'], newInstance: true}));
+});
+
+test('open URL with default browser argument', async t => {
+	await t.notThrowsAsync(open('https://sindresorhus.com', {app: {name: apps.browser}}));
+});
+
+test('open URL with default browser in incognito mode', async t => {
+	await t.notThrowsAsync(open('https://sindresorhus.com', {app: {name: apps.browserPrivate}}));
+});
+
+test('open default browser', async t => {
+	await t.notThrowsAsync(openApp(apps.browser, {newInstance: true}));
+});
+
+test('open default browser in incognito mode', async t => {
+	await t.notThrowsAsync(openApp(apps.browserPrivate, {newInstance: true}));
 });
